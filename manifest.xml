@@ -8,5 +8,4 @@
     <cpp cflags="" lflags="" />
   </export>
   <depend package="drivers/aggregator"/>
-  <depend package="drivers/igc"/>
 </package>

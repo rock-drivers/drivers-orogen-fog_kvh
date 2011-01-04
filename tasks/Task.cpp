@@ -24,6 +24,7 @@ Task::~Task(){
 
 bool Task::configureHook()
 {
+     activity = getActivity<RTT::extras::FileDescriptorActivity>();
      if (! TaskBase::configureHook())
          return false;
 
@@ -36,10 +37,10 @@ bool Task::configureHook()
             return false;
         }
 
-        if(getFileDescriptorActivity())
+        if(activity)
         {
-            getFileDescriptorActivity()->watch(ifg->getReadFD());
-            getFileDescriptorActivity()->setTimeout(_timeout.get());
+            activity->watch(ifg->getReadFD());
+            activity->setTimeout(_timeout.get());
         }
 	currentMode = sensorData::RATE;
 	ifg->toRate();
@@ -61,7 +62,7 @@ bool Task::startHook()
 void Task::updateHook()
 {
     TaskBase::updateHook();
-    RTT::FileDescriptorActivity* activity = getFileDescriptorActivity();
+    activity = getActivity<RTT::extras::FileDescriptorActivity>(); 
     if (activity)
     {
         if (activity->hasError() || activity->hasTimeout())
@@ -69,8 +70,8 @@ void Task::updateHook()
     }
 
 
-    sensorData::iFGConfig config;
-    if(_config.read(config)){
+    sensorData::dsp3000Config config;
+    if(_config.read(config) == RTT::NewData){
     	if(config.reset){
 		ifg->reset();
 	}
@@ -87,7 +88,7 @@ void Task::updateHook()
 	currentMode = config.mode;
     }
 
-    sensorData::iFGReading ifgData;
+    sensorData::dsp3000Reading ifgData;
     ifgData.time = timestamp_estimator->update(base::Time::now());
     if (!ifg->getState(ifgData.rotation))
         return fatal(IO_ERROR);
@@ -111,6 +112,7 @@ void Task::updateHook()
 
     }else{
     	fprintf(stderr,"Warning current mode for fog not implemented yet\n");
+    }
 }
 
 
