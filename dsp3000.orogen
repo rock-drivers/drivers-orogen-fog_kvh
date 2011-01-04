@@ -23,7 +23,7 @@ task_context "Task" do
         doc 'the device port'
 
 
-        fatal_states :IO_ERROR
+        exception_states :IO_ERROR
 	fd_driven	
 end
 

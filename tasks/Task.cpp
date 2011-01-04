@@ -66,7 +66,7 @@ void Task::updateHook()
     if (activity)
     {
         if (activity->hasError() || activity->hasTimeout())
-            return fatal(IO_ERROR);
+            return exception(IO_ERROR);
     }
 
 
@@ -83,7 +83,7 @@ void Task::updateHook()
 		ifg->toIntegradted();
 	}else{
 		fprintf(stderr,"Cannot set unknown mode\n");
-		return fatal();
+		return exception();
 	}
 	currentMode = config.mode;
     }
@@ -91,7 +91,7 @@ void Task::updateHook()
     sensorData::dsp3000Reading ifgData;
     ifgData.time = timestamp_estimator->update(base::Time::now());
     if (!ifg->getState(ifgData.rotation))
-        return fatal(IO_ERROR);
+        return exception(IO_ERROR);
 
     if(currentMode == sensorData::RATE)
 	    _rotation.write(ifgData);
@@ -100,7 +100,7 @@ void Task::updateHook()
     base::samples::RigidBodyState reading;
     if(currentMode == sensorData::RATE){
 	    static double time=0.010574;
-	    sum+=ifgData.rotation*time;
+	    sum += ifgData.rotation*time;
 	    reading.time = ifgData.time;
 	    reading.orientation = Eigen::AngleAxisd(sum, Eigen::Vector3d::Unit(2)); 
 	    reading.angular_velocity = Eigen::Vector3d(0,0,ifgData.rotation);
