@@ -1,0 +1,40 @@
+name "dsp3000"
+version "0.1"
+
+using_library "dsp3000"
+using_library "aggregator"
+
+import_types_from "base"
+import_types_from "dsp3000Reading.hpp"
+
+
+task_context "Task" do
+	input_port("config","sensorData::dsp3000Config").
+		doc("Configuration for the dsp3000 if not set dsp3000 runs in RATE mode since boot")
+
+	output_port("rotation","sensorData::dsp3000Reading")
+    	output_port('orientation_samples', '/base/samples/RigidBodyState').
+        	doc 'provides timestamped IMUReading samples containing the orientation estimate'
+
+        property('timeout', 'int', 100).
+            doc "how long we wait for data before going into IO_ERROR state, in milliseconds"
+
+	property('port', '/std/string', "").
+        doc 'the device port'
+
+
+        fatal_states :IO_ERROR
+	fd_driven	
+end
+
+deployment "dsp3000_driver" do
+	bla = task("DSP3000Task","Task")
+	do_not_install
+	
+	add_default_logger
+
+	if !corba_enabled?
+		browse bla
+	end
+end
+
