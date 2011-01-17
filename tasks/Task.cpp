@@ -9,12 +9,14 @@ Task::Task(std::string const& name)
     : TaskBase(name)
 {
 	currentMode = sensorData::RATE;
+	ifg=0;
+	timestamp_estimator=0;
 }
 
 
 Task::~Task(){
-    delete ifg;
-    delete timestamp_estimator;
+    if(ifg) delete ifg;
+    if(timestamp_estimator) delete timestamp_estimator;
 }
 
 
@@ -128,9 +130,9 @@ void Task::updateHook()
 void Task::cleanupHook()
 {
     TaskBase::cleanupHook();
-    delete ifg;
+    if(ifg) delete ifg;
     ifg = 0;
-    delete timestamp_estimator;
+    if(timestamp_estimator) delete timestamp_estimator;
     timestamp_estimator = 0;
 }
 
