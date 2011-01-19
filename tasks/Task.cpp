@@ -98,7 +98,9 @@ void Task::updateHook()
     if(currentMode == sensorData::RATE)
 	    _rotation.write(ifgData);
     //TODO Handling for integrated values to igc message
+	
 
+	
     base::samples::RigidBodyState reading;
     if(currentMode == sensorData::RATE){
 	    static double time=0.010574;
@@ -107,14 +109,16 @@ void Task::updateHook()
 	    reading.orientation = Eigen::AngleAxisd(sum, Eigen::Vector3d::Unit(2)); 
 	    reading.angular_velocity = Eigen::Vector3d(0,0,ifgData.rotation);
 	    //TODO add covariances
-
+	    _orientation_samples.write(reading);
     }else if(currentMode == sensorData::INTEGRATED){
     		reading.time = ifgData.time;
 		reading.orientation = Eigen::AngleAxisd(ifgData.rotation, Eigen::Vector3d::Unit(2));
-
+    		_orientation_samples.write(reading);
     }else{
     	fprintf(stderr,"Warning current mode for fog not implemented yet\n");
     }
+
+    
 }
 
 

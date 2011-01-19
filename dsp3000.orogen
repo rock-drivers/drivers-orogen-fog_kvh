@@ -22,13 +22,14 @@ task_context "Task" do
 	property('port', '/std/string', "").
         doc 'the device port'
 
-
+	needs_configuration
         exception_states :IO_ERROR
 	fd_driven	
 end
 
 deployment "dsp3000_driver" do
 	bla = task("DSP3000Task","Task")
+	bla.port = "/dev/fog"
 	do_not_install
 	
 	add_default_logger
