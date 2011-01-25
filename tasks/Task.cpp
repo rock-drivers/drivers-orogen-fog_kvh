@@ -73,7 +73,7 @@ void Task::updateHook()
 
 
     sensorData::dsp3000Config config;
-    if(_config.read(config) == RTT::NewData){
+    while(_config.read(config, false) == RTT::NewData){
     	if(config.reset){
 		ifg->reset();
 	}
