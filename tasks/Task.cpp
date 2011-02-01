@@ -39,11 +39,6 @@ bool Task::configureHook()
             return false;
         }
 
-        if(activity)
-        {
-            activity->watch(ifg->getReadFD());
-            activity->setTimeout(_timeout.get());
-        }
 	currentMode = sensorData::RATE;
 	ifg->toRate();
 	ifg->reset();
@@ -56,6 +51,11 @@ bool Task::startHook()
     if (! TaskBase::startHook())
         return false;
     ifg->clear();
+    if(activity)
+    {
+	activity->watch(ifg->getReadFD());
+	activity->setTimeout(_timeout.get());
+    }
     return true;
 }
 
@@ -126,10 +126,14 @@ void Task::updateHook()
 // {
 //     TaskBase::errorHook();
 // }
-// void Task::stopHook()
-// {
-//     TaskBase::stopHook();
-// }
+void Task::stopHook()
+{
+    TaskBase::stopHook();
+    if(activity)
+    {
+	activity->clearAllWatches();
+    }
+}
 
 void Task::cleanupHook()
 {
