@@ -32,7 +32,7 @@ bool Task::configureHook()
 
 	ifg = new Driver();
         //timestamp_estimator = new aggregator::TimestampEstimator(base::Time::fromSeconds(2));
-        timestamp_estimator = new aggregator::TimestampEstimator(base::Time::fromSeconds(2),base::Time::fromSeconds(0.01));
+        timestamp_estimator = new aggregator::TimestampEstimator(base::Time::fromSeconds(2),base::Time::fromSeconds(0.01),INT_MAX);
 
 	if(!ifg->init(_port.value()))
         {
