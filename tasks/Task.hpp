@@ -20,6 +20,7 @@ namespace dsp3000 {
     protected:
 	Driver *ifg;
     	double sum;
+	int id;
         aggregator::TimestampEstimator* timestamp_estimator;
 	sensorData::dsp3000Mode currentMode;
 	RTT::extras::FileDescriptorActivity* activity;

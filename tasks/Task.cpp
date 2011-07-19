@@ -11,6 +11,7 @@ Task::Task(std::string const& name)
 	currentMode = sensorData::RATE;
 	ifg=0;
 	timestamp_estimator=0;
+	id=0;
 }
 
 
@@ -96,6 +97,7 @@ void Task::updateHook()
     if (!ifg->getState(ifgData.rotation))
         return exception(IO_ERROR);
 
+    ifgData.packedID = id++;
     if(currentMode == sensorData::RATE)
 	    _rotation.write(ifgData);
     //TODO Handling for integrated values to igc message

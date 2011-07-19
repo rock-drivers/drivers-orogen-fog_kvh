@@ -26,6 +26,7 @@ namespace sensorData
 	struct dsp3000Reading{
 		base::Time time;
 		double rotation;
+		int packedID;
 	};
 
 };
