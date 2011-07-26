@@ -24,6 +24,7 @@ namespace dsp3000 {
         aggregator::TimestampEstimator* timestamp_estimator;
 	sensorData::dsp3000Mode currentMode;
 	RTT::extras::FileDescriptorActivity* activity;
+	base::samples::IMUSensors *ifgData;
 
 
 

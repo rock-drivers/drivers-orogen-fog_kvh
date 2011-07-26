@@ -8,5 +8,7 @@
     <cpp cflags="" lflags="" />
   </export>
   <depend package="drivers/aggregator"/>
+  <depend package="tools/logger"/> 
   <depend package="drivers/dsp3000"/>
+  <depend package="base/types"/>
 </package>

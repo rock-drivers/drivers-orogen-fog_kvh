@@ -44,6 +44,14 @@ bool Task::configureHook()
 	currentMode = sensorData::RATE;
 	ifg->toRate();
 	ifg->reset();
+	
+	/** Angular velocity of the FOG gyros use the IMUSensors class **/
+	ifgData = new base::samples::IMUSensors;
+	
+	/** Set to zero the other axis **/
+	ifgData->gyro[0] = 0.00;
+	ifgData->gyro[1] = 0.00;
+
 	return true;
 }
 
@@ -92,14 +100,16 @@ void Task::updateHook()
 	currentMode = config.mode;
     }
 
-    sensorData::dsp3000Reading ifgData;
-    ifgData.time = timestamp_estimator->update(base::Time::now());
-    if (!ifg->getState(ifgData.rotation))
+    double rotation;
+    //sensorData::dsp3000Reading ifgData;
+    ifgData->time = timestamp_estimator->update(base::Time::now());
+    if (!ifg->getState(rotation))
         return exception(IO_ERROR);
-
-    ifgData.packedID = id++;
+    
+    ifgData->gyro[2] = rotation;
+    
     if(currentMode == sensorData::RATE)
-	    _rotation.write(ifgData);
+	    _rotation.write(*ifgData);
     //TODO Handling for integrated values to igc message
 	
 
@@ -107,15 +117,15 @@ void Task::updateHook()
     base::samples::RigidBodyState reading;
     if(currentMode == sensorData::RATE){
 	    static double time=0.010574;
-	    sum += ifgData.rotation*time;
-	    reading.time = ifgData.time;
+	    sum += ifgData->gyro[2]*time;
+	    reading.time = ifgData->time;
 	    reading.orientation = Eigen::AngleAxisd(sum, Eigen::Vector3d::Unit(2)); 
-	    reading.angular_velocity = Eigen::Vector3d(0,0,ifgData.rotation);
+	    reading.angular_velocity = Eigen::Vector3d(0,0,ifgData->gyro[2]);
 	    //TODO add covariances
 	    _orientation_samples.write(reading);
     }else if(currentMode == sensorData::INTEGRATED){
-    		reading.time = ifgData.time;
-		reading.orientation = Eigen::AngleAxisd(ifgData.rotation, Eigen::Vector3d::Unit(2));
+    		reading.time = ifgData->time;
+		reading.orientation = Eigen::AngleAxisd(ifgData->gyro[2], Eigen::Vector3d::Unit(2));
     		_orientation_samples.write(reading);
     }else{
     	fprintf(stderr,"Warning current mode for fog not implemented yet\n");
@@ -145,5 +155,8 @@ void Task::cleanupHook()
     ifg = 0;
     if(timestamp_estimator) delete timestamp_estimator;
     timestamp_estimator = 0;
+    
+    delete ifgData;
+    ifgData = NULL;
 }
 

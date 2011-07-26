@@ -3,19 +3,30 @@ version "0.1"
 
 using_library "dsp3000"
 using_library "aggregator"
-
-import_types_from "base"
 import_types_from "dsp3000Reading.hpp"
-
+import_types_from "base"
 
 task_context "Task" do
+
+	#******************************
+	#******* Input Ports **********
+	#******************************
 	input_port("config","sensorData::dsp3000Config").
 		doc("Configuration for the dsp3000 if not set dsp3000 runs in RATE mode since boot")
 
-	output_port("rotation","sensorData::dsp3000Reading")
-    	output_port('orientation_samples', '/base/samples/RigidBodyState').
-        	doc 'provides timestamped IMUReading samples containing the orientation estimate'
 
+	#******************************
+	#******* Output Ports *********
+	#******************************
+	output_port("rotation","/base/samples/IMUSensors")
+	    doc 'provides timestamped angular velocity along the input axis'
+
+    	output_port("orientation_samples", "/base/samples/RigidBodyState").
+	    doc 'provides timestamped IMUReading samples containing the estimated orientation'
+
+	#******************************
+	#**** Driver Properties *******
+	#******************************
         property('timeout', 'int', 100).
             doc "how long we wait for data before going into IO_ERROR state, in milliseconds"
 
