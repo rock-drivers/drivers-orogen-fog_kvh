@@ -39,9 +39,8 @@ task_context "Task" do
 end
 
 deployment "dsp3000" do
-	bla = task("DSP3000Task","Task")
-	bla.port = "/dev/fog"
-#	do_not_install
+	bla = task("dsp3000","Task")
+	#bla.port = "/dev/fog"
 	
 	add_default_logger
 
