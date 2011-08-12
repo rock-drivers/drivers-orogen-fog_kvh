@@ -49,13 +49,13 @@ bool Task::configureHook()
 	ifgData = new base::samples::IMUSensors;
 	
 	/** Set to zero the other axis **/
-	ifgData->gyro[0] = 0.00;
-	ifgData->gyro[1] = 0.00;
+	ifgData->gyro[0] = NaN;
+	ifgData->gyro[1] = NaN;
 
 	/** Set to zero de other sensors that FOG does not have **/
-	ifgData->acc[0] = 0.00;
-	ifgData->acc[1] = 0.00;
-	ifgData->acc[2] = 0.00;
+	ifgData->acc[0] = NaN;
+	ifgData->acc[1] = NaN;
+	ifgData->acc[2] = NaN;
 
 	ifgData->mag[0] = 0.00;
         ifgData->mag[1] = 0.00;
