@@ -110,20 +110,23 @@ void Task::updateHook()
 	currentMode = config.mode;
     }
 
-    double rotation;
-    
+    double rotation; /**< double to get values from the FOG driver**/
+
+    /** Read the value from the FOG **/
     ifgData->time = timestamp_estimator->update(base::Time::now());
     if (!ifg->getState(rotation))
         return exception(IO_ERROR);
     
+    /** Store the value in the IMUSensors datatype **/
     ifgData->gyro[2] = rotation;
     
+    /** write the object in the port **/
     if(currentMode == sensorData::RATE)
 	    _rotation.write(*ifgData);
     //TODO Handling for integrated values to igc message
 	
 
-	
+    /** Write the integrated output also in the other port (RigidBodyState) **/
     base::samples::RigidBodyState reading;
     if(currentMode == sensorData::RATE){
 	    static double time=0.010574;
