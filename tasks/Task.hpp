@@ -5,7 +5,6 @@
 
 #include "dsp3000/TaskBase.hpp"
 #include <dsp3000.h>
-//#include <dsp3000Reading.hpp>
 #include <rtt/extras/FileDescriptorActivity.hpp>
 
 namespace aggregator

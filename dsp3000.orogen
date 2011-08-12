@@ -7,6 +7,7 @@ import_types_from "dsp3000Reading.hpp"
 import_types_from "base"
 
 task_context "Task" do
+doc ("rock component for FOG DSP 3000 driver")
 
 	#******************************
 	#******* Input Ports **********

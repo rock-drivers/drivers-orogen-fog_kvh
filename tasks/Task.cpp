@@ -1,6 +1,7 @@
 /* Generated from orogen/lib/orogen/templates/tasks/Task.cpp */
 
 #include "Task.hpp"
+#include <base/float.h>
 #include <TimestampEstimator.hpp>
 
 using namespace dsp3000;
@@ -49,17 +50,17 @@ bool Task::configureHook()
 	ifgData = new base::samples::IMUSensors;
 	
 	/** Set to zero the other axis **/
-	ifgData->gyro[0] = NaN;
-	ifgData->gyro[1] = NaN;
+	ifgData->gyro[0] = (double)base::unset<float>();
+	ifgData->gyro[1] = (double)base::unset<float>();
 
 	/** Set to zero de other sensors that FOG does not have **/
-	ifgData->acc[0] = NaN;
-	ifgData->acc[1] = NaN;
-	ifgData->acc[2] = NaN;
+	ifgData->acc[0] = (double)base::unset<float>();
+	ifgData->acc[1] = (double)base::unset<float>();
+	ifgData->acc[2] = (double)base::unset<float>();
 
-	ifgData->mag[0] = 0.00;
-        ifgData->mag[1] = 0.00;
-        ifgData->mag[2] = 0.00;
+	ifgData->mag[0] = (double)base::unset<float>();
+        ifgData->mag[1] = (double)base::unset<float>();
+        ifgData->mag[2] = (double)base::unset<float>();
 
 	return true;
 }
@@ -110,7 +111,7 @@ void Task::updateHook()
     }
 
     double rotation;
-    //sensorData::dsp3000Reading ifgData;
+    
     ifgData->time = timestamp_estimator->update(base::Time::now());
     if (!ifg->getState(rotation))
         return exception(IO_ERROR);
