@@ -10,7 +10,7 @@
 
 #include <base/time.h>
 
-namespace sensorData
+namespace fog_kvh 
 {
 	enum dsp3000Mode{
 		RATE,

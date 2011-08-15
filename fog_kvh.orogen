@@ -1,4 +1,4 @@
-name "dsp3000"
+name "fog_kvh"
 version "0.1"
 
 using_library "dsp3000"
@@ -6,7 +6,7 @@ using_library "aggregator"
 import_types_from "dsp3000Reading.hpp"
 import_types_from "base"
 
-task_context "Task" do
+task_context "Dsp3000" do
 doc ("rock component for FOG DSP 3000 driver")
 
 	#******************************
@@ -40,9 +40,11 @@ doc ("rock component for FOG DSP 3000 driver")
 end
 
 deployment "dsp3000" do
-	bla = task("dsp3000","Task")
+	bla = task("dsp3000","Dsp3000")
 	#bla.port = "/dev/fog"
 	
+	do_not_install
+
 	add_default_logger
 
 	if !corba_enabled?

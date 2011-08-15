@@ -1,22 +1,22 @@
 /* Generated from orogen/lib/orogen/templates/tasks/Task.cpp */
 
-#include "Task.hpp"
+#include "Dsp3000.hpp"
 #include <base/float.h>
 #include <aggregator/TimestampEstimator.hpp>
 
-using namespace dsp3000;
+using namespace fog_kvh;
 
-Task::Task(std::string const& name)
+Dsp3000::Dsp3000(std::string const& name)
     : TaskBase(name)
 {
-	currentMode = sensorData::RATE;
+	currentMode = RATE;
 	ifg=0;
 	timestamp_estimator=0;
 	id=0;
 }
 
 
-Task::~Task(){
+Dsp3000::~Dsp3000(){
     if(ifg) delete ifg;
     if(timestamp_estimator) delete timestamp_estimator;
 }
@@ -26,7 +26,7 @@ Task::~Task(){
 // hooks defined by Orocos::RTT. See Task.hpp for more detailed
 // documentation about them.
 
-bool Task::configureHook()
+bool Dsp3000::configureHook()
 {
      activity = getActivity<RTT::extras::FileDescriptorActivity>();
      if (! TaskBase::configureHook())
@@ -38,11 +38,11 @@ bool Task::configureHook()
 
 	if(!ifg->init(_port.value()))
         {
-            fprintf(stderr,"Cannot initialize iFG Driver\n");
+            fprintf(stderr,"Cannot initialize FOG Driver\n");
             return false;
         }
 
-	currentMode = sensorData::RATE;
+	currentMode = RATE;
 	ifg->toRate();
 	ifg->reset();
 	
@@ -66,7 +66,7 @@ bool Task::configureHook()
 }
 
 
-bool Task::startHook()
+bool Dsp3000::startHook()
 {
     if (! TaskBase::startHook())
         return false;
@@ -81,7 +81,7 @@ bool Task::startHook()
 
 
 
-void Task::updateHook()
+void Dsp3000::updateHook()
 {
     TaskBase::updateHook();
     activity = getActivity<RTT::extras::FileDescriptorActivity>(); 
@@ -92,16 +92,16 @@ void Task::updateHook()
     }
 
 
-    sensorData::dsp3000Config config;
+    dsp3000Config config;
     while(_config.read(config, false) == RTT::NewData){
     	if(config.reset){
 		ifg->reset();
 	}
-	if(config.mode == sensorData::RATE){
+	if(config.mode == RATE){
 		ifg->toRate();
-	}else if(config.mode == sensorData::INCREMENTAL){
+	}else if(config.mode == INCREMENTAL){
 		ifg->toIncremental();
-	}else if(config.mode == sensorData::INTEGRATED){
+	}else if(config.mode == ::INTEGRATED){
 		ifg->toIntegradted();
 	}else{
 		fprintf(stderr,"Cannot set unknown mode\n");
@@ -121,14 +121,14 @@ void Task::updateHook()
     ifgData->gyro[2] = rotation;
     
     /** write the object in the port **/
-    if(currentMode == sensorData::RATE)
+    if(currentMode == RATE)
 	    _rotation.write(*ifgData);
     //TODO Handling for integrated values to igc message
 	
 
     /** Write the integrated output also in the other port (RigidBodyState) **/
     base::samples::RigidBodyState reading;
-    if(currentMode == sensorData::RATE){
+    if(currentMode == RATE){
 	    static double time=0.010574;
 	    sum += ifgData->gyro[2]*time;
 	    reading.time = ifgData->time;
@@ -136,7 +136,7 @@ void Task::updateHook()
 	    reading.angular_velocity = Eigen::Vector3d(0,0,ifgData->gyro[2]);
 	    //TODO add covariances
 	    _orientation_samples.write(reading);
-    }else if(currentMode == sensorData::INTEGRATED){
+    }else if(currentMode == INTEGRATED){
     		reading.time = ifgData->time;
 		reading.orientation = Eigen::AngleAxisd(ifgData->gyro[2], Eigen::Vector3d::Unit(2));
     		_orientation_samples.write(reading);
@@ -148,11 +148,11 @@ void Task::updateHook()
 }
 
 
-// void Task::errorHook()
+// void Dsp3000::errorHook()
 // {
 //     TaskBase::errorHook();
 // }
-void Task::stopHook()
+void Dsp3000::stopHook()
 {
     TaskBase::stopHook();
     if(activity)
@@ -161,7 +161,7 @@ void Task::stopHook()
     }
 }
 
-void Task::cleanupHook()
+void Dsp3000::cleanupHook()
 {
     TaskBase::cleanupHook();
     if(ifg) delete ifg;
