@@ -1,23 +1,23 @@
 /* Generated from orogen/lib/orogen/templates/tasks/Task.cpp */
 
-#include "Dsp3000.hpp"
+#include "Dsp3000Task.hpp"
 #include <base/float.h>
 #include <aggregator/TimestampEstimator.hpp>
 
 using namespace fog_kvh;
 
-Dsp3000::Dsp3000(std::string const& name)
-    : TaskBase(name)
+Dsp3000Task::Dsp3000Task(std::string const& name)
+    : Dsp3000TaskBase(name)
 {
 	currentMode = RATE;
-	ifg=0;
+	driver=0;
 	timestamp_estimator=0;
 	id=0;
 }
 
 
-Dsp3000::~Dsp3000(){
-    if(ifg) delete ifg;
+Dsp3000Task::~Dsp3000Task(){
+    if(driver) delete driver;
     if(timestamp_estimator) delete timestamp_estimator;
 }
 
@@ -26,54 +26,54 @@ Dsp3000::~Dsp3000(){
 // hooks defined by Orocos::RTT. See Task.hpp for more detailed
 // documentation about them.
 
-bool Dsp3000::configureHook()
+bool Dsp3000Task::configureHook()
 {
      activity = getActivity<RTT::extras::FileDescriptorActivity>();
-     if (! TaskBase::configureHook())
+     if (! Dsp3000TaskBase::configureHook())
          return false;
 
-	ifg = new Driver();
+	driver = new Dsp3000Driver();
         //timestamp_estimator = new aggregator::TimestampEstimator(base::Time::fromSeconds(2));
         timestamp_estimator = new aggregator::TimestampEstimator(base::Time::fromSeconds(2),base::Time::fromSeconds(0.01),INT_MAX);
 
-	if(!ifg->init(_port.value()))
+	if(!driver->init(_port.value()))
         {
             fprintf(stderr,"Cannot initialize FOG Driver\n");
             return false;
         }
 
 	currentMode = RATE;
-	ifg->toRate();
-	ifg->reset();
+	driver->toRate();
+	driver->reset();
 	
 	/** Angular velocity of the FOG gyros use the IMUSensors class **/
-	ifgData = new base::samples::IMUSensors;
+	driverData = new base::samples::IMUSensors;
 	
 	/** Set to zero the other axis **/
-	ifgData->gyro[0] = (double)base::unset<float>();
-	ifgData->gyro[1] = (double)base::unset<float>();
+	driverData->gyro[0] = (double)base::unset<float>();
+	driverData->gyro[1] = (double)base::unset<float>();
 
 	/** Set to zero de other sensors that FOG does not have **/
-	ifgData->acc[0] = (double)base::unset<float>();
-	ifgData->acc[1] = (double)base::unset<float>();
-	ifgData->acc[2] = (double)base::unset<float>();
+	driverData->acc[0] = (double)base::unset<float>();
+	driverData->acc[1] = (double)base::unset<float>();
+	driverData->acc[2] = (double)base::unset<float>();
 
-	ifgData->mag[0] = (double)base::unset<float>();
-        ifgData->mag[1] = (double)base::unset<float>();
-        ifgData->mag[2] = (double)base::unset<float>();
+	driverData->mag[0] = (double)base::unset<float>();
+        driverData->mag[1] = (double)base::unset<float>();
+        driverData->mag[2] = (double)base::unset<float>();
 
 	return true;
 }
 
 
-bool Dsp3000::startHook()
+bool Dsp3000Task::startHook()
 {
-    if (! TaskBase::startHook())
+    if (! Dsp3000TaskBase::startHook())
         return false;
-    ifg->clear();
+    driver->clear();
     if(activity)
     {
-	activity->watch(ifg->getReadFD());
+	activity->watch(driver->getReadFD());
 	activity->setTimeout(_timeout.get());
     }
     return true;
@@ -81,9 +81,9 @@ bool Dsp3000::startHook()
 
 
 
-void Dsp3000::updateHook()
+void Dsp3000Task::updateHook()
 {
-    TaskBase::updateHook();
+    Dsp3000TaskBase::updateHook();
     activity = getActivity<RTT::extras::FileDescriptorActivity>(); 
     if (activity)
     {
@@ -95,14 +95,14 @@ void Dsp3000::updateHook()
     dsp3000Config config;
     while(_config.read(config, false) == RTT::NewData){
     	if(config.reset){
-		ifg->reset();
+		driver->reset();
 	}
 	if(config.mode == RATE){
-		ifg->toRate();
+		driver->toRate();
 	}else if(config.mode == INCREMENTAL){
-		ifg->toIncremental();
+		driver->toIncremental();
 	}else if(config.mode == ::INTEGRATED){
-		ifg->toIntegradted();
+		driver->toIntegradted();
 	}else{
 		fprintf(stderr,"Cannot set unknown mode\n");
 		return exception();
@@ -113,16 +113,16 @@ void Dsp3000::updateHook()
     double rotation; /**< double to get values from the FOG driver**/
 
     /** Read the value from the FOG **/
-    ifgData->time = timestamp_estimator->update(base::Time::now());
-    if (!ifg->getState(rotation))
+    driverData->time = timestamp_estimator->update(base::Time::now());
+    if (!driver->getState(rotation))
         return exception(IO_ERROR);
     
     /** Store the value in the IMUSensors datatype **/
-    ifgData->gyro[2] = rotation;
+    driverData->gyro[2] = rotation;
     
     /** write the object in the port **/
     if(currentMode == RATE)
-	    _rotation.write(*ifgData);
+	    _rotation.write(*driverData);
     //TODO Handling for integrated values to igc message
 	
 
@@ -130,15 +130,15 @@ void Dsp3000::updateHook()
     base::samples::RigidBodyState reading;
     if(currentMode == RATE){
 	    static double time=0.010574;
-	    sum += ifgData->gyro[2]*time;
-	    reading.time = ifgData->time;
+	    sum += driverData->gyro[2]*time;
+	    reading.time = driverData->time;
 	    reading.orientation = Eigen::AngleAxisd(sum, Eigen::Vector3d::Unit(2)); 
-	    reading.angular_velocity = Eigen::Vector3d(0,0,ifgData->gyro[2]);
+	    reading.angular_velocity = Eigen::Vector3d(0,0,driverData->gyro[2]);
 	    //TODO add covariances
 	    _orientation_samples.write(reading);
     }else if(currentMode == INTEGRATED){
-    		reading.time = ifgData->time;
-		reading.orientation = Eigen::AngleAxisd(ifgData->gyro[2], Eigen::Vector3d::Unit(2));
+    		reading.time = driverData->time;
+		reading.orientation = Eigen::AngleAxisd(driverData->gyro[2], Eigen::Vector3d::Unit(2));
     		_orientation_samples.write(reading);
     }else{
     	fprintf(stderr,"Warning current mode for fog not implemented yet\n");
@@ -148,28 +148,28 @@ void Dsp3000::updateHook()
 }
 
 
-// void Dsp3000::errorHook()
+// void Dsp3000Task::errorHook()
 // {
-//     TaskBase::errorHook();
+//     Dsp3000TaskBase::errorHook();
 // }
-void Dsp3000::stopHook()
+void Dsp3000Task::stopHook()
 {
-    TaskBase::stopHook();
+    Dsp3000TaskBase::stopHook();
     if(activity)
     {
 	activity->clearAllWatches();
     }
 }
 
-void Dsp3000::cleanupHook()
+void Dsp3000Task::cleanupHook()
 {
-    TaskBase::cleanupHook();
-    if(ifg) delete ifg;
-    ifg = 0;
+    Dsp3000TaskBase::cleanupHook();
+    if(driver) delete driver;
+    driver = 0;
     if(timestamp_estimator) delete timestamp_estimator;
     timestamp_estimator = 0;
     
-    delete ifgData;
-    ifgData = NULL;
+    delete driverData;
+    driverData = NULL;
 }
 

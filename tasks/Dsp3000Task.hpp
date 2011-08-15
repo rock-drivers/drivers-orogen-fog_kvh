@@ -3,7 +3,7 @@
 #ifndef DSP3000_TASK_TASK_HPP
 #define DSP3000_TASK_TASK_HPP
 
-#include "fog_kvh/Dsp3000Base.hpp"
+#include "fog_kvh/Dsp3000TaskBase.hpp"
 #include <dsp3000.h>
 #include <rtt/extras/FileDescriptorActivity.hpp>
 
@@ -13,23 +13,25 @@ namespace aggregator
 };
 
 namespace fog_kvh {
-    class Dsp3000 : public TaskBase
+	class Dsp3000Driver;
+    class Dsp3000Task : public Dsp3000TaskBase
     {
-	friend class TaskBase;
+	friend class Dsp3000TaskBase;
     protected:
-	Driver *ifg;
+	
+	Dsp3000Driver *driver;
    	double sum;
 	int id;
     aggregator::TimestampEstimator* timestamp_estimator;
 	dsp3000Mode currentMode;
 	RTT::extras::FileDescriptorActivity* activity;
-	base::samples::IMUSensors *ifgData;
+	base::samples::IMUSensors *driverData;
 
 
 
     public:
-        Task(std::string const& name = "fog_kvh::Dsp3000");
-	~Task();
+        Dsp3000Task(std::string const& name = "fog_kvh::Dsp3000Task");
+		~Dsp3000Task();
         /** This hook is called by Orocos when the state machine transitions
          * from PreOperational to Stopped. If it returns false, then the
          * component will stay in PreOperational. Otherwise, it goes into

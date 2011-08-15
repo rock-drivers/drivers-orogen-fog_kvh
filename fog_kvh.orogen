@@ -6,13 +6,13 @@ using_library "aggregator"
 import_types_from "dsp3000Reading.hpp"
 import_types_from "base"
 
-task_context "Dsp3000" do
+task_context "Dsp3000Task" do
 doc ("rock component for FOG DSP 3000 driver")
 
 	#******************************
 	#******* Input Ports **********
 	#******************************
-	input_port("config","sensorData::dsp3000Config").
+	input_port("config","fog_kvh::dsp3000Config").
 		doc("Configuration for the dsp3000 if not set dsp3000 runs in RATE mode since boot")
 
 
@@ -40,7 +40,7 @@ doc ("rock component for FOG DSP 3000 driver")
 end
 
 deployment "dsp3000" do
-	bla = task("dsp3000","Dsp3000")
+	bla = task("dsp3000","Dsp3000Task")
 	#bla.port = "/dev/fog"
 	
 	do_not_install
