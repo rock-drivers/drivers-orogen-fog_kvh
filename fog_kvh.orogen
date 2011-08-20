@@ -1,7 +1,7 @@
 name "fog_kvh"
 version "0.1"
 
-using_library "dsp3000"
+using_library "fog_kvh"
 using_library "aggregator"
 import_types_from "dsp3000Reading.hpp"
 import_types_from "base"
