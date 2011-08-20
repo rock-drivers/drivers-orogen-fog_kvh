@@ -1,6 +1,8 @@
 /* Generated from orogen/lib/orogen/templates/tasks/Task.cpp */
 
 #include "Dsp3000Task.hpp"
+#include <fog_kvh/dsp3000.h>
+#include <rtt/extras/FileDescriptorActivity.hpp>
 #include <base/float.h>
 #include <aggregator/TimestampEstimator.hpp>
 
@@ -47,20 +49,18 @@ bool Dsp3000Task::configureHook()
 	driver->reset();
 	
 	/** Angular velocity of the FOG gyros use the IMUSensors class **/
-	driverData = new base::samples::IMUSensors;
-	
 	/** Set to zero the other axis **/
-	driverData->gyro[0] = (double)base::unset<float>();
-	driverData->gyro[1] = (double)base::unset<float>();
+	driverData.gyro[0] = (double)base::unset<float>();
+	driverData.gyro[1] = (double)base::unset<float>();
 
 	/** Set to zero de other sensors that FOG does not have **/
-	driverData->acc[0] = (double)base::unset<float>();
-	driverData->acc[1] = (double)base::unset<float>();
-	driverData->acc[2] = (double)base::unset<float>();
+	driverData.acc[0] = (double)base::unset<float>();
+	driverData.acc[1] = (double)base::unset<float>();
+	driverData.acc[2] = (double)base::unset<float>();
 
-	driverData->mag[0] = (double)base::unset<float>();
-        driverData->mag[1] = (double)base::unset<float>();
-        driverData->mag[2] = (double)base::unset<float>();
+	driverData.mag[0] = (double)base::unset<float>();
+        driverData.mag[1] = (double)base::unset<float>();
+        driverData.mag[2] = (double)base::unset<float>();
 
 	return true;
 }
@@ -113,16 +113,16 @@ void Dsp3000Task::updateHook()
     double rotation; /**< double to get values from the FOG driver**/
 
     /** Read the value from the FOG **/
-    driverData->time = timestamp_estimator->update(base::Time::now());
+    driverData.time = timestamp_estimator->update(base::Time::now());
     if (!driver->getState(rotation))
         return exception(IO_ERROR);
     
     /** Store the value in the IMUSensors datatype **/
-    driverData->gyro[2] = rotation;
+    driverData.gyro[2] = rotation;
     
     /** write the object in the port **/
     if(currentMode == RATE)
-	    _rotation.write(*driverData);
+	    _rotation.write(driverData);
     //TODO Handling for integrated values to igc message
 	
 
@@ -130,15 +130,15 @@ void Dsp3000Task::updateHook()
     base::samples::RigidBodyState reading;
     if(currentMode == RATE){
 	    static double time=0.010574;
-	    sum += driverData->gyro[2]*time;
-	    reading.time = driverData->time;
+	    sum += driverData.gyro[2]*time;
+	    reading.time = driverData.time;
 	    reading.orientation = Eigen::AngleAxisd(sum, Eigen::Vector3d::Unit(2)); 
-	    reading.angular_velocity = Eigen::Vector3d(0,0,driverData->gyro[2]);
+	    reading.angular_velocity = Eigen::Vector3d(0,0,driverData.gyro[2]);
 	    //TODO add covariances
 	    _orientation_samples.write(reading);
     }else if(currentMode == INTEGRATED){
-    		reading.time = driverData->time;
-		reading.orientation = Eigen::AngleAxisd(driverData->gyro[2], Eigen::Vector3d::Unit(2));
+    		reading.time = driverData.time;
+		reading.orientation = Eigen::AngleAxisd(driverData.gyro[2], Eigen::Vector3d::Unit(2));
     		_orientation_samples.write(reading);
     }else{
     	fprintf(stderr,"Warning current mode for fog not implemented yet\n");
@@ -168,8 +168,5 @@ void Dsp3000Task::cleanupHook()
     driver = 0;
     if(timestamp_estimator) delete timestamp_estimator;
     timestamp_estimator = 0;
-    
-    delete driverData;
-    driverData = NULL;
 }
 

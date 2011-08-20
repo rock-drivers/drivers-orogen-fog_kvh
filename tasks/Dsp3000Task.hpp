@@ -4,16 +4,16 @@
 #define DSP3000_TASK_TASK_HPP
 
 #include "fog_kvh/Dsp3000TaskBase.hpp"
-#include <dsp3000.h>
-#include <rtt/extras/FileDescriptorActivity.hpp>
+#include <base/samples/imu.h>
 
 namespace aggregator
 {
     class TimestampEstimator;
 };
+namespace RTT { namespace extras { class FileDescriptorActivity; } }
 
 namespace fog_kvh {
-	class Dsp3000Driver;
+    class Dsp3000Driver;
     class Dsp3000Task : public Dsp3000TaskBase
     {
 	friend class Dsp3000TaskBase;
@@ -24,8 +24,8 @@ namespace fog_kvh {
 	int id;
     aggregator::TimestampEstimator* timestamp_estimator;
 	dsp3000Mode currentMode;
+	base::samples::IMUSensors driverData;
 	RTT::extras::FileDescriptorActivity* activity;
-	base::samples::IMUSensors *driverData;
 
 
 
