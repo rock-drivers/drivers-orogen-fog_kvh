@@ -31,7 +31,7 @@ doc ("rock component for FOG DSP 3000 driver")
         property('timeout', 'int', 100).
             doc "how long we wait for data before going into IO_ERROR state, in milliseconds"
 
-	property('port', '/std/string', "").
+	property('port', '/std/string', "/dev/ttyS5").
         doc 'the device port'
 
 	needs_configuration
