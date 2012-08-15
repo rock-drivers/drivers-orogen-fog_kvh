@@ -25,6 +25,8 @@ doc ("rock component for FOG DSP 3000 driver")
     	output_port("orientation_samples", "/base/samples/RigidBodyState").
 	    doc 'provides timestamped IMUReading samples containing the estimated orientation'
 
+        output_port "timestamp_estimator_status", "/aggregator/TimestampEstimatorStatus"
+
 	#******************************
 	#**** Driver Properties *******
 	#******************************

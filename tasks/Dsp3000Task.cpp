@@ -76,6 +76,7 @@ bool Dsp3000Task::startHook()
 	activity->watch(driver->getReadFD());
 	activity->setTimeout(_timeout.get());
     }
+    timestamp_estimator->reset();
     return true;
 }
 
@@ -144,6 +145,7 @@ void Dsp3000Task::updateHook()
     	fprintf(stderr,"Warning current mode for fog not implemented yet\n");
     }
 
+    _timestamp_estimator_status.write(timestamp_estimator->getStatus());
     
 }
 

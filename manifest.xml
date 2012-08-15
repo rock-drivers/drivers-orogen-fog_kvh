@@ -11,4 +11,5 @@
   <depend package="tools/logger"/> 
   <depend package="drivers/fog_kvh"/>
   <depend package="base/types"/>
+  <tags>stable</tags>
 </package>
