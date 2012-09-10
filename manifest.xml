@@ -7,7 +7,7 @@
   <export>
     <cpp cflags="" lflags="" />
   </export>
-  <depend package="drivers/aggregator"/>
+  <depend package="drivers/orogen/aggregator"/>
   <depend package="tools/logger"/> 
   <depend package="drivers/fog_kvh"/>
   <depend package="base/types"/>
