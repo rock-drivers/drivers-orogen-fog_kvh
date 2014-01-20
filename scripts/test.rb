@@ -10,8 +10,8 @@ ENV['PKG_CONFIG_PATH'] = "#{File.expand_path("..", File.dirname(__FILE__))}/buil
 
 Orocos.initialize
 
-Orocos::Process.spawn 'dsp3000' do |p|
-    driver = p.task 'dsp3000'
+Orocos.run 'dsp3000' do
+    driver = TaskContext.get 'dsp3000'
     Orocos.log_all_ports
 
     driver.port = ARGV[0]
@@ -24,7 +24,7 @@ Orocos::Process.spawn 'dsp3000' do |p|
           print("#{sample.time.to_f} #{sample.orientation.yaw}\r\n")
 	end
 	sleep 0.01
-        Vizkit.process_events
+ #       Vizkit.process_events
     end
 end
 
