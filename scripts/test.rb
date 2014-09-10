@@ -10,7 +10,7 @@ ENV['PKG_CONFIG_PATH'] = "#{File.expand_path("..", File.dirname(__FILE__))}/buil
 
 Orocos.initialize
 
-Orocos.run 'dsp3000' do
+Orocos.run 'fog_kvh::Dsp3000Task' => "dsp3000" do
     driver = TaskContext.get 'dsp3000'
     Orocos.log_all_ports
 
