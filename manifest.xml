@@ -1,6 +1,7 @@
 <package>
   <description brief="DSP 3000 Module"></description>
   <author>Matthias Goldhoorn/matthias.goldhoorn@dfki.de</author> 
+  <maintainer>Matthias Goldhoorn/matthias.goldhoorn@uni-bremen.de</maintainer>
   <license></license>
   <url>http://</url>
   <logo>http://</logo>
