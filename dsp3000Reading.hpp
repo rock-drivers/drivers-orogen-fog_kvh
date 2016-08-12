@@ -8,7 +8,7 @@
 #ifndef DSP3000READING_H
 #define DSP3000READING_H
 
-#include <base/time.h>
+#include <base/Time.hpp>
 
 namespace fog_kvh 
 {

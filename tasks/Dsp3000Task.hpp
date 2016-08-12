@@ -4,7 +4,7 @@
 #define DSP3000_TASK_TASK_HPP
 
 #include "fog_kvh/Dsp3000TaskBase.hpp"
-#include <base/samples/imu.h>
+#include <base/samples/IMUSensors.hpp>
 
 namespace aggregator
 {

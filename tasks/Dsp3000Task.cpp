@@ -3,7 +3,7 @@
 #include "Dsp3000Task.hpp"
 #include <fog_kvh/dsp3000.h>
 #include <rtt/extras/FileDescriptorActivity.hpp>
-#include <base/float.h>
+#include <base/Float.hpp>
 #include <aggregator/TimestampEstimator.hpp>
 
 using namespace fog_kvh;
